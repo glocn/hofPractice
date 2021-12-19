@@ -93,31 +93,35 @@ var cookiesOnly = function(desserts) {
 
 // return the total price of all products.
 var sumTotal = function(products) {
-
-  _.each(products, function(item) {
-    var array = [];
-
-    var price = item.price;
-    var num = price.slice(1);
-    parseInt(num);
+  //need to remember to reduce the entire function
+  return _.reduce(products, function(memoizer, value) {
+    //should value price is a string with '$' and should be converted to num
+    var num = parseFloat(value.price.slice(1));
     //console.log(num);
-    array.push(num);
-    //console.log(array);
-    //return array;
-
-    var sum = _.reduce(array, function(memoizer, value) {
-     //return memoizer + value.price;
-      console.log(array);
-      return memoizer + value;
-      //console.log(products.price);
-    });
-  });
+   // console.log(typeof num);
+    return memoizer + num;
+    //start iteration at index 0
+  }, 0);
 };
 
 // return an object consisting of dessert types and how many of each.
 // exampleOutput: { dessertType: 3, dessertType2: 1 }
 var dessertCategories = function(desserts) {
+  //grab the name of dessert
+  //value as the count
 
+  return _.reduce(desserts, function(memoizer, value) {
+    var dessertType = value.type;
+    //memoizer starts off as an empty obj passed
+
+    //if the dessertType isn't present in obj
+    if (memoizer[dessertType] === undefined) {
+      memoizer[dessertType] = 1;
+    } else {
+      memoizer[dessertType]++;
+    }
+    return memoizer;
+  }, {});
 };
 
 // given an array of movie data objects,return an array containing
@@ -125,6 +129,15 @@ var dessertCategories = function(desserts) {
 // TIP: use an array as your accumulator - don't push to an external array!
 var ninetiesKid = function(movies) {
 
+  return _.reduce(movies, function(memoizer, value) {
+    //console.log(value);
+    var year = value.releaseYear;
+
+    if (year >= 1990 && year <= 2000) {
+      memoizer.push(value.title);
+    }
+    return memoizer;
+  }, []);
 };
 
 // return an boolean stating if there exists a movie with a shorter
@@ -132,6 +145,16 @@ var ninetiesKid = function(movies) {
 // timeLimit is an integer representing a number of minutes.
 var movieNight = function(movies, timeLimit) {
 
+  return _.reduce(movies, function(memoizer, value) {
+    //console.log(value);
+    var runtime = value.runtime;
+    //check if runtime is less than timelimit
+    if (runtime < timeLimit) {
+      memoizer = true;
+    }
+    return memoizer;
+    //set memoizer to false as default
+  }, false);
 };
 
 /*
@@ -143,14 +166,32 @@ var movieNight = function(movies, timeLimit) {
 // given an array of strings, use _.map to return a new array containing all
 // strings converted to uppercase letters.
 var upperCaseFruits = function(fruits) {
-
+  _.map(fruits, function(string) {
+    return string.toUpperCase();
+  });
 };
 
 // given an array of dessert objects, return a new array of objects
 // that have a new "glutenFree" property, with a boolean value.
 // TIP: Items that contain flour are not gluten-free.
 var glutenFree = function(desserts) {
-
+  _.map(desserts, function(item) {
+    //get ingredients array
+    var ingredients = item.ingredients;
+    //iterate through each ingredient to find if they contain flour
+    _.each(ingredients, function(flour) {
+      //if the item contains flour
+      //add the propoerty glutenFree with value of false
+      //otherwise add the property of glutenFree with value of true
+      if (flour.indexOf('flour') > -1) {
+        item.glutenFree = false;
+      } else {
+        item.glutenFree = true;
+      }
+    });
+  });
+  //return original array of obj
+  return desserts;
 };
 
 // use _.map to return an array of items with their sale prices, with a new property
@@ -175,4 +216,19 @@ var glutenFree = function(desserts) {
 */
 var applyCoupon = function(groceries, coupon) {
 
+  _.map(groceries, function(item) {
+    //console.log(item);
+    //grab original price (which is a string)
+      //convert string to number and remove '$'
+    var price = parseFloat(item.price.slice(1));
+    //find saleprice
+    var num = price - (price * coupon);
+    //round saleprice to 2 decimal places
+    var round = num.toFixed(2);
+    //add salePrice to obj
+    item.salePrice = '$' + round.toString();
+
+  });
+  //return original array of obj
+  return groceries;
 };
